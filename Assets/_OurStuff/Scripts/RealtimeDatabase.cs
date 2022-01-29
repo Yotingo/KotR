@@ -267,14 +267,18 @@ public class RealtimeDatabase : MonoBehaviour
         {
             string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
             bool hasBeenSent = false;
+
             foreach (User user in _matchHandler._userList)
             {
+                Debug.Log(user.UserName);
+
                 if (user.Avatar == avatarNameCur)
                 {
                     if (user.sentUp == true) hasBeenSent = true;
                     if (user.sentDown == true) hasBeenSent = true;
 
                     _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName; // Not working
+                    Debug.Log("User's name is " + user.UserName);
                 }
             }
 

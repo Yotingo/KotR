@@ -13,8 +13,8 @@ public class MatchHandler : MonoBehaviour
     public float _roundChangeTime; // When the change will happen
 
     private enum Rounds {Lobby, Initializing, Voting, Waiting, GameOver}
-    Rounds _roundCurrent = Rounds.Initializing;
-    Rounds _roundLast = Rounds.Initializing;
+    Rounds _roundCurrent = Rounds.Voting;
+    Rounds _roundLast = Rounds.Voting;
 
     private float _upateLast;
 
@@ -50,6 +50,7 @@ public class MatchHandler : MonoBehaviour
     {
         _reference = FirebaseDatabase.DefaultInstance.RootReference;
         _countDownTimer = GameObject.Find("Round Timer");
+        _roundTitle = GameObject.Find("Round Title");
         _characterListGO = GameObject.Find("Characters");
         DontDestroyOnLoad(_characterListGO);
     }
@@ -97,9 +98,9 @@ public class MatchHandler : MonoBehaviour
 
     public void MatchStart(bool host)
     {
-        Debug.Log("Initializing Round has started");
+        Debug.Log("Votingo Round has started");
         _roundLast = Rounds.GameOver;
-        _roundCurrent = Rounds.Initializing;
+        _roundCurrent = Rounds.Voting;
         _matchLocal.RoundCurrent = 1;
         StartCoroutine(LateInit());
 
@@ -167,6 +168,7 @@ public class MatchHandler : MonoBehaviour
         {
             switch (_roundCurrent)
             {
+                /*
                 case Rounds.Initializing:
                     Debug.Log("Voting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting starts in:";
@@ -174,6 +176,7 @@ public class MatchHandler : MonoBehaviour
                     _matchLocal.RoundCurrent = 2; //Move to Voting Round
                     _roundCurrent = Rounds.Voting;
                     break;
+                */
 
                 case Rounds.Voting:
                     // total the votes
@@ -289,6 +292,7 @@ public class MatchHandler : MonoBehaviour
                 }
                 break;
 
+                /*
             case Rounds.Initializing:
                 //if (TimeUtils.GetUnixTime() > _matchLocal.RoundTimer)
                 if (_roundCurrent != _roundLast) // Just started the round
@@ -298,6 +302,7 @@ public class MatchHandler : MonoBehaviour
                     //_matchLocal.RoundTimer = TimeUtils.GetUnixTime() + 90f;
                 }
                 break;
+                */
 
             case Rounds.Voting:
                 if (_roundCurrent != _roundLast) // Just started the round
