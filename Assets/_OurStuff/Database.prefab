@@ -1,0 +1,90 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3640961146883268817
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3640961146883268816}
+  - component: {fileID: 3640961146883268819}
+  - component: {fileID: 3640961146883268818}
+  m_Layer: 0
+  m_Name: Database
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3640961146883268816
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3640961146883268817}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3640961146883268819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3640961146883268817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f17db6e776033f418257833d6a63ff2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _username: {fileID: 0}
+  _usernameToRead: {fileID: 0}
+  _avatarNumber: {fileID: 0}
+  _matchHandler: {fileID: 3640961146883268818}
+--- !u!114 &3640961146883268818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3640961146883268817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e94b537f3c01304191e707f9d217035, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _matchStartedClient: 0
+  _matchStartedHost: 0
+  _roundChangeTime: 0
+  _countDownTimer: {fileID: 0}
+  _secretnamesReference:
+  - Jim
+  - Bob
+  - Jane
+  - Stan
+  - Dan
+  - Flan
+  - Reese
+  - Fleece
+  - Geese
+  - Whopper
+  - ShowStopper
+  - Burrito
+  _avatarList:
+  - {fileID: 1071665755241190450, guid: 9a2319e21899e7a4382464d6b6c6885d, type: 3}
+  - {fileID: 1071665755241190450, guid: 9a2319e21899e7a4382464d6b6c6885d, type: 3}
+  _secretActionReference:
+  - Wave
+  - Jump
+  - ThumbsUp
+  - CrossLegs
+  - LookUp
+  - Cough
+  - Wink

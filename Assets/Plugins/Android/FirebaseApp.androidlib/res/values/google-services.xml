@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/firebase_database_url,@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_android_client_id,@string/default_web_client_id">
+  <string name="firebase_database_url" translatable="false">https://keepers-of-the-realm-default-rtdb.firebaseio.com</string>
+  <string name="gcm_defaultSenderId" translatable="false">31595376832</string>
+  <string name="google_storage_bucket" translatable="false">keepers-of-the-realm.appspot.com</string>
+  <string name="project_id" translatable="false">keepers-of-the-realm</string>
+  <string name="google_api_key" translatable="false">AIzaSyBh5_3fwY3Ym_X3hZHcPC3xzabbB7oPVYs</string>
+  <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBh5_3fwY3Ym_X3hZHcPC3xzabbB7oPVYs</string>
+  <string name="google_app_id" translatable="false">1:31595376832:android:e20880d8a3f113a2aebd25</string>
+  <string name="default_android_client_id" translatable="false">31595376832-pouk881teqraifu9fdgdc6tn8hajp56i.apps.googleusercontent.com</string>
+  <string name="default_web_client_id" translatable="false">31595376832-p0dfoov2rlfj96e7ssfu4d0kd1svdn49.apps.googleusercontent.com</string>
+</resources>

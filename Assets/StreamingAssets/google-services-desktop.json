@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "31595376832",
+    "firebase_url": "https://keepers-of-the-realm-default-rtdb.firebaseio.com",
+    "project_id": "keepers-of-the-realm",
+    "storage_bucket": "keepers-of-the-realm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:31595376832:android:e20880d8a3f113a2aebd25",
+        "android_client_info": {
+          "package_name": "com.DefaultCompany.KotRFirebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "31595376832-pouk881teqraifu9fdgdc6tn8hajp56i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.DefaultCompany.KotRFirebase",
+            "certificate_hash": "3db3ccdf494327f871cd33d096c995e26e4d11a3"
+          }
+        },
+        {
+          "client_id": "31595376832-p0dfoov2rlfj96e7ssfu4d0kd1svdn49.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBh5_3fwY3Ym_X3hZHcPC3xzabbB7oPVYs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "31595376832-p0dfoov2rlfj96e7ssfu4d0kd1svdn49.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
