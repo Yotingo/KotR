@@ -98,8 +98,7 @@ public class RealtimeDatabase : MonoBehaviour
             }
             else
             {
-                JoinGameProcess();
-                _matchHandler.MatchStart(true);
+                JoinGameProcess(true);
                 //_matchHandler._matchStarted = true;
             }
 
@@ -113,9 +112,7 @@ public class RealtimeDatabase : MonoBehaviour
             }
             else
             {
-                _matchHandler.PrepareForMatch(); // Setup local match files
-                JoinGameProcess();
-                _matchHandler.MatchStart(false);
+                JoinGameProcess(false);
 
                 //if (_matchHandler._matchLocal == null)
                 //{
@@ -133,20 +130,29 @@ public class RealtimeDatabase : MonoBehaviour
     }
 
     // Logic for joining
-    private void JoinGameProcess ()
+    private void JoinGameProcess (bool isHost)
     {
-        //-------------------------------Create User-------------------------
-        User user = new User(); //Create new User class
-        user.UserName = _username.text; //Save UserName inside User class as the input field text
-        _matchHandler._userLocal = user;
-
-        // Update the match info locally
-        _matchHandler.MatchUpdateClient();
-
-
         //--------------------------------Avatar----------------------------
         if (AvatarSelect() == true)
         {
+            //-------------------------------Create User-------------------------
+            User user = new User(); //Create new User class
+            user.UserName = _username.text; //Save UserName inside User class as the input field text
+            _matchHandler._userLocal = user;
+
+            if (isHost)
+            {
+                _matchHandler.MatchStart(false);
+            }
+            else
+            {
+                _matchHandler.PrepareForMatch(); // Setup local match files
+                _matchHandler.MatchStart(true);
+            }
+
+            // Update the match info locally
+            _matchHandler.MatchUpdateClient();
+
 
             //--------------------------Secret Name-------------------------
             string selectedName = "UnAssigned";
@@ -260,7 +266,7 @@ public class RealtimeDatabase : MonoBehaviour
         int avatarNumberCur = int.Parse(_avatarNumber.text);
         _matchHandler._avatarList[avatarNumberCur].SetActive(false);
 
-
+        Debug.Log("Current round "+ _matchHandler._roundCurrent);
         //---------------------------------On Menu Screen-----------------------------
         if (_matchHandler._roundCurrent == 0) 
         {
@@ -286,7 +292,6 @@ public class RealtimeDatabase : MonoBehaviour
                     }
                 }
 
-                Debug.Log(_matchHandler._matchLocal.AvatarsPicked);
                 Debug.Log(_matchHandler._matchLocal.AvatarsPicked.Count);
 
                 // Null check
@@ -419,6 +424,7 @@ public class RealtimeDatabase : MonoBehaviour
         // Enable selected avatar
         _avatarNumber.text = avatarNumberCur.ToString();
         _matchHandler._avatarList[avatarNumberCur].SetActive(true);
+        Debug.Log("End of Avatar Selecet. AvatarNumberCur " + avatarNumberCur);
     }
     
     //public void AvatarLast ()
@@ -518,6 +524,7 @@ public class RealtimeDatabase : MonoBehaviour
             if( user.Avatar == avatarNameCur )
             {
                 _matchHandler._userLocal.CurrentVote = user.UserName;
+                Debug.Log("Voted for " + user.UserName);
                 break;
             }
         }
@@ -537,6 +544,7 @@ public class RealtimeDatabase : MonoBehaviour
         });
 
         Debug.Log("I voted!");
+        _matchHandler._voteButton.GetComponentInChildren<Text>().text = ("I voted for " + avatarNameCur);
 
         GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
     }

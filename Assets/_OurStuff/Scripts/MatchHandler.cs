@@ -26,7 +26,7 @@ public class MatchHandler : MonoBehaviour
     [SerializeField] GameObject _characterListGO;
     [SerializeField] GameObject _countDownTimer;
     [SerializeField] GameObject _roundTitle;
-    [HideInInspector] public User _userLocal;
+    [HideInInspector] public User _userLocal = new User();
     [HideInInspector] public Match _matchLocal = new Match();
     public List<string> _secretnamesReference = new List<string>();
     public List<GameObject> _avatarList = new List<GameObject>();
@@ -331,6 +331,22 @@ public class MatchHandler : MonoBehaviour
                 {
                     Debug.Log("Waiting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting starts in:";
+
+                    _userLocal.CurrentVote = "";
+
+                    //-------------------Add User to database--------------------
+                    string json = JsonUtility.ToJson(_userLocal); //Comvert class to json file
+                    _reference.Child("User").Child(_userLocal.UserName).SetRawJsonValueAsync(json).ContinueWith(task =>
+                    {
+                        if (task.IsCompleted)
+                        {
+                            Debug.Log("Successfully added vote to Firebase.");
+                        }
+                        else
+                        {
+                            Debug.Log("Adding vote failed.");
+                        }
+                    });
                 }
                 break;
 

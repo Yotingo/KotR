@@ -576,6 +576,56 @@ PrefabInstance:
       propertyPath: _characterListGO
       value: 
       objectReference: {fileID: 949542804}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.size
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[0]
+      value: 
+      objectReference: {fileID: 1010159425}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[1]
+      value: 
+      objectReference: {fileID: 1875554494}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[2]
+      value: 
+      objectReference: {fileID: 1037217913}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[3]
+      value: 
+      objectReference: {fileID: 1273637126}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[4]
+      value: 
+      objectReference: {fileID: 2107501792}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[5]
+      value: 
+      objectReference: {fileID: 1448134745}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[6]
+      value: 
+      objectReference: {fileID: 473098961}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[7]
+      value: 
+      objectReference: {fileID: 1246836333}
+    - target: {fileID: 3640961146883268818, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
+        type: 3}
+      propertyPath: _avatarList.Array.data[8]
+      value: 
+      objectReference: {fileID: 764303078}
     - target: {fileID: 3640961146883268819, guid: 1d370bf7d9403aa408ff36f5b2f6369c,
         type: 3}
       propertyPath: _username
@@ -1028,8 +1078,8 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 364140656}
         m_TargetAssemblyTypeName: RealtimeDatabase, Assembly-CSharp
-        m_MethodName: AvatarLast
-        m_Mode: 1
+        m_MethodName: AvatarCycle
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -2415,15 +2465,15 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 364140656}
         m_TargetAssemblyTypeName: RealtimeDatabase, Assembly-CSharp
-        m_MethodName: AvatarNext
-        m_Mode: 1
+        m_MethodName: AvatarCycle
+        m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 0
+          m_BoolArgument: 1
         m_CallState: 2
 --- !u!114 &1664640607
 MonoBehaviour:
