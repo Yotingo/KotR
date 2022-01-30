@@ -15,7 +15,7 @@ public class RealtimeDatabase : MonoBehaviour
     [SerializeField] MatchHandler _matchHandler;
     [SerializeField] GameObject _directionalLight;
 
-    private bool _mainMenuScene = true;
+    //private bool _mainMenuScene = true;
 
     private void Awake()
     {
@@ -29,14 +29,14 @@ public class RealtimeDatabase : MonoBehaviour
 
     }
 
-    void OnLevelFinishedLoading(Scene scene, LoadSceneMode mode)
-    {
-        //Debug.Log("Level Loaded");
-        //Debug.Log(scene.name);
-        //Debug.Log(mode);
+    //void OnSceneLoaded (Scene scene, LoadSceneMode mode)
+    //{
+    //    //Debug.Log("Level Loaded");
+    //    //Debug.Log(scene.name);
+    //    //Debug.Log(mode);
 
-        if (scene.name == "MainGame") _mainMenuScene = false;
-    }
+    //    if (scene.name == "MainGame") _mainMenuScene = false;
+    //}
 
 
     void Update()
@@ -137,8 +137,11 @@ public class RealtimeDatabase : MonoBehaviour
     {
         //-------------------------------Create User-------------------------
         User user = new User(); //Create new User class
-        _matchHandler._userLocal = user;
         user.UserName = _username.text; //Save UserName inside User class as the input field text
+        _matchHandler._userLocal = user;
+
+        // Update the match info locally
+        _matchHandler.MatchUpdateClient();
 
 
         //--------------------------------Avatar----------------------------
@@ -236,35 +239,59 @@ public class RealtimeDatabase : MonoBehaviour
         {
             _matchHandler.ResetMatch(); // Setup and reset database match files
         }
-        else
-        {
-            _matchHandler.PrepareForMatch(); // Setup local match files
-        }
+        //else
+        //{
+        //    _matchHandler.PrepareForMatch(); // Setup local match files
+        //}
     }
 
     public void AvatarNext()
     {
+        //-------------------------------Disable Current Avatar--------------------------
+        // Find 'Avatar Number' and set reference
         if (_avatarNumber == null)
         {
             _avatarNumber = GameObject.Find("Avatar Number").GetComponent<Text>();
             _avatarNumber.text = 0.ToString();
         }
 
+        // Parse the 'avatarNumberCur' from the '_avatarNumber' text gameOject
         int avatarNumberCur = int.Parse(_avatarNumber.text);
         _matchHandler._avatarList[avatarNumberCur].SetActive(false);
 
-        avatarNumberCur += 1;
 
-        if (avatarNumberCur > _matchHandler._avatarList.Count - 1)
+        //---------------------------------On Menu Screen-----------------------------
+        if (_matchHandler._matchStartedHost == false) 
         {
-            avatarNumberCur = 0;
+            bool nextAvailableAvatarFound = false;
+            while (nextAvailableAvatarFound == false)
+            {
+                avatarNumberCur += 1;
+
+                if (avatarNumberCur > _matchHandler._avatarList.Count - 1)
+                {
+                    avatarNumberCur = 0;
+                }
+
+                // This avatar is available
+                if (_matchHandler._matchLocal != null && _matchHandler._matchLocal.AvatarsPicked != null)
+                {
+                    if (!_matchHandler._matchLocal.AvatarsPicked.Contains(_matchHandler._avatarList[avatarNumberCur].name))
+                    {
+                        nextAvailableAvatarFound = true; // Continue
+                    }
+                }
+                else
+                {
+                    nextAvailableAvatarFound = true; // Continue
+                }
+            }
         }
-
-        _avatarNumber.text = avatarNumberCur.ToString();
-        _matchHandler._avatarList[avatarNumberCur].SetActive(true);
-
-        if (_mainMenuScene == false) // On gameplay screen. Do voting.
+        //------------------------------On gameplay screen---------------------------
+        else
         {
+            Debug.Log("Avatar Next");
+
             string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
             bool hasBeenSent = false;
 
@@ -293,6 +320,10 @@ public class RealtimeDatabase : MonoBehaviour
                 _matchHandler._voteButton.SetActive(false);
             }
         }
+
+        // Enable selected avatar
+        _avatarNumber.text = avatarNumberCur.ToString();
+        _matchHandler._avatarList[avatarNumberCur].SetActive(true);
     }
 
     public void AvatarLast ()
@@ -315,7 +346,7 @@ public class RealtimeDatabase : MonoBehaviour
         _avatarNumber.text = avatarNumberCur.ToString();
         _matchHandler._avatarList[avatarNumberCur].SetActive(true);
 
-        if (_mainMenuScene == false) // On gameplay screen. Do voting.
+        if (_matchHandler._matchStartedHost == true) // On gameplay screen. Do voting.
         {
             string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
             bool hasBeenSent = false;

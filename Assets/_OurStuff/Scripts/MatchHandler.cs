@@ -1,20 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Firebase;
+using Firebase.Unity;
 using Firebase.Database;
 using UnityEngine.UI;
 
 public class MatchHandler : MonoBehaviour
 {
     // Match State
-    public bool _matchStartedClient = false;
+    public bool _matchStartedClient = true;
     public bool _matchStartedHost = false;
     //private bool _matchInitialized = false;
     public float _roundChangeTime; // When the change will happen
 
     private enum Rounds {Lobby, Initializing, Voting, Waiting, GameOver}
-    Rounds _roundCurrent = Rounds.Voting;
-    Rounds _roundLast = Rounds.Voting;
+    Rounds _roundCurrent = Rounds.Initializing;
+    Rounds _roundLast = Rounds.Initializing;
 
     private float _upateLast;
 
@@ -98,26 +100,28 @@ public class MatchHandler : MonoBehaviour
 
     public void MatchStart(bool host)
     {
-        Debug.Log("Votingo Round has started");
+        Debug.Log("Voting Round has started");
         _roundLast = Rounds.GameOver;
-        _roundCurrent = Rounds.Voting;
-        _matchLocal.RoundCurrent = 1;
         StartCoroutine(LateInit());
 
         if (host)
         {
+            _roundCurrent = Rounds.Voting;
+            _matchLocal.RoundCurrent = 1;
             _roundChangeTime = Time.time + 10f;
             _matchStartedHost = true;
             _matchStartedClient = false;
         }
         else
         {
+            //_roundCurrent = Rounds.Initializing;
+            //_matchLocal.RoundCurrent = 1;
             _matchStartedHost = false;
             _matchStartedClient = true;
         }
     }
 
-    private IEnumerator LateInit ()
+    private IEnumerator LateInit () 
     {
         yield return new WaitForSeconds(0.2f);
         _characterListGO.transform.position = GameObject.Find("Character Anchor").transform.position; //Move characters to center of screen
@@ -150,6 +154,7 @@ public class MatchHandler : MonoBehaviour
         secretNameListText = GameObject.Find("Scroll List True Names Text");
         secretNameListPanel.SetActive(false);
 
+        //this will probably need to be called after all users have joined
         string listText = "";
        foreach(User user in _userList)
        {
@@ -168,15 +173,14 @@ public class MatchHandler : MonoBehaviour
         {
             switch (_roundCurrent)
             {
-                /*
                 case Rounds.Initializing:
+                    // The initializing round is used in place of a lobby. We can't jump staight into a voting round without all the players being connected.
                     Debug.Log("Voting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting starts in:";
                     _roundChangeTime = Time.time + 10f;
                     _matchLocal.RoundCurrent = 2; //Move to Voting Round
                     _roundCurrent = Rounds.Voting;
                     break;
-                */
 
                 case Rounds.Voting:
                     // total the votes
@@ -252,7 +256,7 @@ public class MatchHandler : MonoBehaviour
         });
     }
 
-    private void MatchUpdateClient ()
+    public void MatchUpdateClient ()
     {
         // Read from Database
         _reference.Child("Match").GetValueAsync().ContinueWith(task =>
@@ -292,7 +296,6 @@ public class MatchHandler : MonoBehaviour
                 }
                 break;
 
-                /*
             case Rounds.Initializing:
                 //if (TimeUtils.GetUnixTime() > _matchLocal.RoundTimer)
                 if (_roundCurrent != _roundLast) // Just started the round
@@ -302,7 +305,6 @@ public class MatchHandler : MonoBehaviour
                     //_matchLocal.RoundTimer = TimeUtils.GetUnixTime() + 90f;
                 }
                 break;
-                */
 
             case Rounds.Voting:
                 if (_roundCurrent != _roundLast) // Just started the round
@@ -390,38 +392,52 @@ public class MatchHandler : MonoBehaviour
         {
             if (task.IsCompleted)
             {
-                //_userListLocal.Clear(); //Clear the list before rebuilding
-
                 DataSnapshot snapshot = task.Result;
                 //Debug.Log(snapshot.Child("UserName").Value.ToString
+
+                _userList.Clear();
 
                 int count = 0;
                 foreach (var child in snapshot.Children)
                 {
                     count++;
 
-                    User user = JsonUtility.FromJson<User>(snapshot.GetRawJsonValue());
-                    foreach (User userCurrent in _userList)
-                    {
-                        if (userCurrent.UserName == user.UserName)
-                        {
-                            if (userCurrent.sentUp != user.sentUp || userCurrent.sentDown != user.sentDown)
-                            {
-                                PlayerSentPop(user);
-                                if (user.UserName == _userLocal.UserName)
-                                {
-                                    _userLocal.sentDown = user.sentDown;
-                                    _userLocal.sentUp = user.sentUp;
-                                }
-                            }
-                        }
-                        _userList.Remove(userCurrent);
-                        _userList.Add(user);
-                    }
+                    //string name = child.Child("UserName").Value.ToString();
+                    //Debug.Log(name.ToString());
+
+                    User user = JsonUtility.FromJson<User>(child.GetRawJsonValue());
+                    //Debug.Log(user.UserName);
+
+                    // Build _userList
+                    _userList.Add(user);
+
+                    //// Send Check
+                    //foreach (User userCurrent in _userList)
+                    //{
+                    //    if (userCurrent.UserName == user.UserName)
+                    //    {
+                    //        if (userCurrent.sentUp != user.sentUp || userCurrent.sentDown != user.sentDown)
+                    //        {
+                    //            PlayerSentPop(user);
+                    //            if (user.UserName == _userLocal.UserName)
+                    //            {
+                    //                _userLocal.sentDown = user.sentDown;
+                    //                _userLocal.sentUp = user.sentUp;
+                    //            }
+                    //        }
+                    //    }
+                    //    _userList.Remove(userCurrent);
+                    //    _userList.Add(user);
+                    //}
                 }
                 //Debug.Log("number of users " + count);
             }
         });
+
+        //foreach (User user in _userList)
+        //{
+        //    Debug.Log(user.UserName);
+        //}
     }
 
     private void PlayerSentPop (User userSent)
@@ -469,21 +485,23 @@ public class MatchHandler : MonoBehaviour
         }
     }
 
-    public void PrepareForMatch ()
+    public void PrepareForMatch () //called by Clients
     {
-        Match match = new Match();
-        _matchLocal = match;
-        _matchLocal.IsGameOver = false;
-        _matchStartedClient = false;
-        _matchStartedHost = false;
-        _matchLocal.RoundCurrent = 0;
-        //_matchInitialized = false;
-        _matchLocal.AvatarsPicked.Clear(); //Clear avatar pick list
-        _matchLocal.SecretNamesPicked.Clear();
-        _matchLocal.SecretNamesPicked.Add("Init");
+        MatchUpdateClient();
+
+        //Match match = new Match();
+        //_matchLocal = match;
+        //_matchLocal.IsGameOver = false;
+        //_matchStartedClient = false;
+        //_matchStartedHost = false;
+        //_matchLocal.RoundCurrent = 0;
+        ////_matchInitialized = false;
+        //_matchLocal.AvatarsPicked.Clear(); //Clear avatar pick list
+        //_matchLocal.SecretNamesPicked.Clear();
+        //_matchLocal.SecretNamesPicked.Add("Init");
     }
 
-    public void ResetMatch()
+    public void ResetMatch() //called by Host
     {
         Match match = new Match();
         _matchLocal = match;
