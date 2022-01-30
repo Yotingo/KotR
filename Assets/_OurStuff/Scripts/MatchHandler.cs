@@ -138,7 +138,7 @@ public class MatchHandler : MonoBehaviour
         GameObject.Find("Vote Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarVote(); });
         GameObject.Find("Send Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarSend(); });
 
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(0.3f);
         _countDownTimer = GameObject.Find("Round Timer");
         _roundTitle = GameObject.Find("Round Title");
         _voteButton = GameObject.Find("Vote Button");
@@ -161,6 +161,9 @@ public class MatchHandler : MonoBehaviour
         secretNameListPanel = GameObject.Find("Scroll List True Names Panel");
         secretNameListText = GameObject.Find("Scroll List True Names Text");
         secretNameListPanel.SetActive(false);
+
+        GameObject clickBlocker = GameObject.Find("Click Blocker");
+        clickBlocker.SetActive(false);
 
         //this will probably need to be called after all users have joined
         string listText = "";
@@ -192,13 +195,13 @@ public class MatchHandler : MonoBehaviour
                     _roundCurrent = Rounds.Voting;
                     break;
 
-                case Rounds.Voting:
+                case Rounds.Voting:           
                     // total the votes
                     Dictionary<string, int> voteCountByUsername = new Dictionary<string, int>();
-                    foreach( User user in _userList)
+                    foreach(User user in _userList)
                     {
                         int newTotal = 0;
-                        voteCountByUsername.TryGetValue(user.UserName, out newTotal);
+                        voteCountByUsername.TryGetValue(user.CurrentVote, out newTotal);
                         newTotal++;
                         voteCountByUsername[user.CurrentVote] = newTotal;
                     }
@@ -206,6 +209,9 @@ public class MatchHandler : MonoBehaviour
                     KeyValuePair<string, int> highestPair;
                     foreach (KeyValuePair<string, int> entry in voteCountByUsername)
                     {
+                        if (entry.Key == "")
+                            continue;
+
                         if(!highestPair.Equals(default(KeyValuePair<string, int>)))
                         {
                             if( highestPair.Value > entry.Value )
@@ -218,9 +224,33 @@ public class MatchHandler : MonoBehaviour
                             highestPair = entry;
                         }
                     }
-                    string winningUsername = highestPair.Key;
+
+                    string winningUsername;
+                    if (highestPair.Equals(default(KeyValuePair<string, int>))) // if the highestPair equals zero (no votes were made)
+                    {
+                        int winner = Random.Range(0, _userList.Count - 1);
+                        winningUsername = _userList[winner].UserName;
+                    }
+                    else
+                    {
+                        winningUsername = highestPair.Key;
+                    }
+
+                    Debug.Log("The new list holder is " + winningUsername);
                     _matchLocal.ListHolderUserName = winningUsername;
                     newPlayerHasListPopup.SetActive(true);
+
+                    // Activate ListDisplayButton for the Host
+                    Debug.Log("ListHolderName =  " + _matchLocal.ListHolderUserName);
+                    Debug.Log("UserName =  " + _userLocal.UserName);
+                    if (_matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown)
+                    {
+                        _viewListButton.SetActive(true);
+                    }
+                    else
+                    {
+                        _viewListButton.SetActive(false);
+                    }
 
                     Debug.Log("Waiting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting starts in:";
@@ -279,6 +309,10 @@ public class MatchHandler : MonoBehaviour
                 _matchLocal = match; // Overwrite local Match class
                 //Debug.Log(_matchLocal.ActionAscend);
                 // enable list viewing if we got voted and aren't sent
+
+                Debug.Log("ListHolderName =  " + _matchLocal.ListHolderUserName);
+                Debug.Log("UserName =  " + _userLocal.UserName);
+
                 if( _matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown )
                 {
                     _viewListButton.SetActive(true);

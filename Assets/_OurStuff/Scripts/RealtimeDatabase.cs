@@ -132,26 +132,26 @@ public class RealtimeDatabase : MonoBehaviour
     // Logic for joining
     private void JoinGameProcess (bool isHost)
     {
+        //-------------------------------Create User-------------------------
+        User user = new User(); //Create new User class
+        user.UserName = _username.text; //Save UserName inside User class as the input field text
+        _matchHandler._userLocal = user;
+
+
         //--------------------------------Avatar----------------------------
         if (AvatarSelect() == true)
         {
-            //-------------------------------Create User-------------------------
-            User user = new User(); //Create new User class
-            user.UserName = _username.text; //Save UserName inside User class as the input field text
-            _matchHandler._userLocal = user;
-
             if (isHost)
             {
-                _matchHandler.MatchStart(false);
+                _matchHandler.MatchStart(true);
             }
             else
             {
+                // Update the match info locally
+                _matchHandler.MatchUpdateClient();
                 _matchHandler.PrepareForMatch(); // Setup local match files
-                _matchHandler.MatchStart(true);
+                _matchHandler.MatchStart(false);
             }
-
-            // Update the match info locally
-            _matchHandler.MatchUpdateClient();
 
 
             //--------------------------Secret Name-------------------------
@@ -474,6 +474,13 @@ public class RealtimeDatabase : MonoBehaviour
     //        }    
     //    }
     //}
+
+    public void AvatarHide (bool hide)
+    {
+            // Parse the 'avatarNumberCur' from the '_avatarNumber' text gameOject
+            int avatarNumberCur = int.Parse(_avatarNumber.text);
+            _matchHandler._avatarList[avatarNumberCur].SetActive(hide);
+    }
 
     // Called when join match is selected
     public bool AvatarSelect ()
