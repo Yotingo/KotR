@@ -20,6 +20,8 @@ public class MatchHandler : MonoBehaviour
 
     private float _upateLast;
 
+    private bool initDone = false;
+
     // References
     DatabaseReference _reference;
     RealtimeDatabase _realtimeDatabase;
@@ -185,6 +187,8 @@ public class MatchHandler : MonoBehaviour
         secretNameListText.GetComponent<Text>().text = listText;
 
         _realtimeDatabase.AvatarCycle(true);
+
+        initDone = true;
     }
 
     private void MatchUpdateHost()
@@ -342,13 +346,16 @@ public class MatchHandler : MonoBehaviour
             }
         });
 
-        if (_matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown)
+        if (initDone == true)
         {
-            _viewListButton.SetActive(true);
-        }
-        else
-        {
-            _viewListButton.SetActive(false);
+            if (_matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown)
+            {
+                _viewListButton.SetActive(true);
+            }
+            else
+            {
+                _viewListButton.SetActive(false);
+            }
         }
 
         UsersLocalUpdate(); // Update the local user info from Database
@@ -422,8 +429,6 @@ public class MatchHandler : MonoBehaviour
         }
 
         _roundLast = (Rounds)_matchLocal.RoundCurrent; // Update the last Round Enum
-
-        Debug.Log("I'm the client and here's my 'matchLocal' " + _matchLocal.SecretNamesPicked);
     }
 
     public void AvatarSendCheck ()
