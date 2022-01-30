@@ -353,6 +353,7 @@ public class RealtimeDatabase : MonoBehaviour
                         if (user.sentDown == true) hasBeenSent = true;
 
                         _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName;
+                        _matchHandler._voteButton.GetComponentInChildren<Text>().text = ("Vote for " + user.UserName); 
                         Debug.Log("User's name is " + user.UserName);
 
                         break;
