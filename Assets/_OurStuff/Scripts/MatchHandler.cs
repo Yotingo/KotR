@@ -193,7 +193,7 @@ public class MatchHandler : MonoBehaviour
 
         //_matchLocal.RoundTimer = _roundChangeTime;
         //Debug.Log(_matchLocal.RoundTimer);
-        //Debug.Log(_roundCurrent);
+        Debug.Log(_roundCurrent);
         if (Time.time > _roundChangeTime)
         {
             switch (_roundCurrent)
@@ -298,7 +298,7 @@ public class MatchHandler : MonoBehaviour
                     _roundChangeTime = Time.time + 10f;
                     _matchLocal.RoundCurrent = 1; //Move to Initializing Round
                     gameOverPanel.SetActive(true);
-                    gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = gameOverText;
+                    gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = gameOverText;
                     //TO-DO: Return to main menu
                     break;
             }
@@ -416,7 +416,7 @@ public class MatchHandler : MonoBehaviour
                 {
                     Debug.Log("Game over Round has started");
                     gameOverPanel.SetActive(true);
-                    gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = gameOverText;
+                    gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = gameOverText;
                 }
                 break;
         }
@@ -568,7 +568,7 @@ public class MatchHandler : MonoBehaviour
     {
         int totalSentUp = 0;
         int totalSentDown = 0;
-        int target = (_userList.Count / 2) + 1;
+        int target = (_userList.Count / 2);
         foreach (User user in _userList)
         {
             if (user.sentUp == true)
