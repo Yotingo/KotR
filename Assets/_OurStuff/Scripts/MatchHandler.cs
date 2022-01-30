@@ -339,17 +339,17 @@ public class MatchHandler : MonoBehaviour
 
                 Debug.Log("ListHolderName =  " + _matchLocal.ListHolderUserName);
                 Debug.Log("UserName =  " + _userLocal.UserName);
-
-                if( _matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown )
-                {
-                    _viewListButton.SetActive(true);
-                }
-                else
-                {
-                    _viewListButton.SetActive(false);
-                }
             }
         });
+
+        if (_matchLocal.ListHolderUserName == _userLocal.UserName && !_userLocal.sentUp && !_userLocal.sentDown)
+        {
+            _viewListButton.SetActive(true);
+        }
+        else
+        {
+            _viewListButton.SetActive(false);
+        }
 
         UsersLocalUpdate(); // Update the local user info from Database
 
@@ -422,6 +422,8 @@ public class MatchHandler : MonoBehaviour
         }
 
         _roundLast = (Rounds)_matchLocal.RoundCurrent; // Update the last Round Enum
+
+        Debug.Log("I'm the client and here's my 'matchLocal' " + _matchLocal.SecretNamesPicked);
     }
 
     public void AvatarSendCheck ()
@@ -503,7 +505,7 @@ public class MatchHandler : MonoBehaviour
                 //Debug.Log(snapshot.Child("UserName").Value.ToString
 
                 _userList.Clear();
-                if (_matchStartedHost == true) _matchLocal.AvatarsPicked.Clear();
+                //if (_matchStartedHost == true) _matchLocal.AvatarsPicked.Clear();
 
                 int count = 0;
                 foreach (var child in snapshot.Children)
@@ -542,7 +544,10 @@ public class MatchHandler : MonoBehaviour
                     // Update Match info
                     if (_matchStartedHost == true)
                     {
-                        _matchLocal.AvatarsPicked.Add(user.Avatar);
+                        if (!_matchLocal.AvatarsPicked.Contains(user.Avatar))
+                        {
+                            _matchLocal.AvatarsPicked.Add(user.Avatar);
+                        }
                     }
                 }
                 //Debug.Log("number of users " + count);
