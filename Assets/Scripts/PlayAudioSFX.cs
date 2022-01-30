@@ -13,7 +13,7 @@ public class PlayAudioSFX : MonoBehaviour
 	
 	public void playArrowSound()
 	{
-		int r = Random.Range(0, 1);
+		int r = Random.Range(0, 2);
 		if( r > 0 )
 		{
 			arrow1.PlayOneShot(arrow1.clip);
@@ -26,8 +26,8 @@ public class PlayAudioSFX : MonoBehaviour
 
 	public void playJoinLaugh()
 	{
-		float jr = Random.Range(0, 1);
-		if( jr < .9 )
+		float jr = Random.Range(0f, 1f);
+		if( jr < .9f )
 		{
 			joinLaugh.PlayOneShot(joinLaugh.clip);
 		}
