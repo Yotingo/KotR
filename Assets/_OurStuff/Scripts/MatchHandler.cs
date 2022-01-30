@@ -41,6 +41,9 @@ public class MatchHandler : MonoBehaviour
     [HideInInspector] public GameObject _gameOverScreen;
     [HideInInspector] public GameObject _gameOverWinnerText;
 
+    [HideInInspector] public GameObject gameOverPanel;
+    string gameOverText;
+
     [HideInInspector] public GameObject playerSentPopup;
     [HideInInspector] public GameObject playerSentText;
 
@@ -139,7 +142,7 @@ public class MatchHandler : MonoBehaviour
         GameObject.Find("Vote Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarVote(); });
         GameObject.Find("Send Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarSend(); });
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(2.3f);
         _countDownTimer = GameObject.Find("Round Timer");
         _roundTitle = GameObject.Find("Round Title");
         _voteButton = GameObject.Find("Vote Button");
@@ -148,9 +151,9 @@ public class MatchHandler : MonoBehaviour
 
         playerNameLabel = GameObject.Find("PlayerNameLabel");
 
-        _gameOverScreen = GameObject.Find("Game Over Up Panel");
-        _gameOverWinnerText = GameObject.Find("Winner Text");
-        _gameOverScreen.SetActive(false);
+        //_gameOverScreen = GameObject.Find("Game Over Up Panel");
+        //_gameOverWinnerText = GameObject.Find("Winner Text");
+        //_gameOverScreen.SetActive(false);
 
         playerSentPopup = GameObject.Find("Player Sent Announcement Panel");
         playerSentText = GameObject.Find("Player Sent Announcement Text");
@@ -166,6 +169,9 @@ public class MatchHandler : MonoBehaviour
         secretInfoPanel = GameObject.Find("Secret Info Panel");
         secretInfoPanel.gameObject.transform.GetChild(0).GetComponent<Text>().text = _userLocal.Team;
         secretInfoPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = _userLocal.SecretAction;
+
+        gameOverPanel = GameObject.Find("Game Over Panel");
+        gameOverPanel.SetActive(false);
 
         GameObject clickBlocker = GameObject.Find("Click Blocker");
         clickBlocker.SetActive(false);
@@ -187,6 +193,7 @@ public class MatchHandler : MonoBehaviour
 
         //_matchLocal.RoundTimer = _roundChangeTime;
         //Debug.Log(_matchLocal.RoundTimer);
+        //Debug.Log(_roundCurrent);
         if (Time.time > _roundChangeTime)
         {
             switch (_roundCurrent)
@@ -290,6 +297,8 @@ public class MatchHandler : MonoBehaviour
                     Debug.Log("Game Over Round has started");
                     _roundChangeTime = Time.time + 10f;
                     _matchLocal.RoundCurrent = 1; //Move to Initializing Round
+                    gameOverPanel.SetActive(true);
+                    gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = gameOverText;
                     //TO-DO: Return to main menu
                     break;
             }
@@ -406,6 +415,8 @@ public class MatchHandler : MonoBehaviour
                 if (_roundCurrent != _roundLast) // Just started the round
                 {
                     Debug.Log("Game over Round has started");
+                    gameOverPanel.SetActive(true);
+                    gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = gameOverText;
                 }
                 break;
         }
@@ -549,6 +560,8 @@ public class MatchHandler : MonoBehaviour
         // Activate pop up
         playerSentPopup.SetActive(true);
         playerSentText.GetComponent<Text>().text = userSent.UserName + " was sent "+(userSent.sentUp?"up":"down")+"!";
+
+        gameOverPanel.SetActive(true);
     }
 
     private void GameOverCheck ()
@@ -580,16 +593,26 @@ public class MatchHandler : MonoBehaviour
         }
     }
 
+
     private void WinSreen(bool upWon)
     {
         Debug.Log("Game Over " + upWon);
-        _gameOverScreen.SetActive(true);
-        _gameOverWinnerText.GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!";
+        //_gameOverScreen.SetActive(true);
+        Debug.Log("1");
+        //_gameOverWinnerText.GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!";
 
+        //gameOverPanel.SetActive(true);
+        //gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!";
+        gameOverText = upWon ? "Ascend Team won!" : "Descend Team won!";
+
+        Debug.Log("2");
         // Update match to new phase
         _roundCurrent = Rounds.GameOver;
+        Debug.Log("3");
         _matchLocal.IsGameOver = true;
-        _matchLocal.RoundCurrent = (int)Rounds.GameOver;
+        Debug.Log("4");
+        _matchLocal.RoundCurrent = (int)Rounds.GameOver; 
+        Debug.Log("The current round should be GameOver " + _roundCurrent);
 
         //_matchLocal.RoundTimer = _roundChangeTime - Time.time;
 
