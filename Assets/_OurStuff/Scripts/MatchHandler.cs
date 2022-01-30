@@ -193,6 +193,20 @@ public class MatchHandler : MonoBehaviour
 
     private void MatchUpdateHost()
     {
+        // Read from Database
+        _reference.Child("Match").GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                DataSnapshot snapshot = task.Result;
+                //Debug.Log(snapshot.Child("ActionAscend").Value.ToString());
+                Match match = JsonUtility.FromJson<Match>(snapshot.GetRawJsonValue());
+                _matchLocal.SecretNamesPicked = match.SecretNamesPicked; // Overwrite local Match class
+                //Debug.Log(_matchLocal.ActionAscend);
+                // enable list viewing if we got voted and aren't sent
+            }
+        });
+
         UsersLocalUpdate(); // Update the local user info from Database
 
         //_matchLocal.RoundTimer = _roundChangeTime;
