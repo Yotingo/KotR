@@ -171,7 +171,6 @@ public class MatchHandler : MonoBehaviour
         secretNameListText.GetComponent<Text>().text = listText;
 
         _realtimeDatabase.AvatarCycle(true);
-        _voteButton.SetActive(true);
     }
 
     private void MatchUpdateHost()
