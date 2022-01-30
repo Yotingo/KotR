@@ -14,19 +14,20 @@ public class MatchHandler : MonoBehaviour
     //private bool _matchInitialized = false;
     public float _roundChangeTime; // When the change will happen
 
-    private enum Rounds {Lobby, Initializing, Voting, Waiting, GameOver}
-    Rounds _roundCurrent = Rounds.Initializing;
-    Rounds _roundLast = Rounds.Initializing;
+    public enum Rounds {Lobby, Initializing, Voting, Waiting, GameOver}
+    public Rounds _roundCurrent = Rounds.Lobby;
+    Rounds _roundLast = Rounds.Lobby;
 
     private float _upateLast;
 
     // References
     DatabaseReference _reference;
+    RealtimeDatabase _realtimeDatabase;
     [SerializeField] GameObject _characterListGO;
     [SerializeField] GameObject _countDownTimer;
     [SerializeField] GameObject _roundTitle;
     [HideInInspector] public User _userLocal;
-    [HideInInspector] public Match _matchLocal;
+    [HideInInspector] public Match _matchLocal = new Match();
     public List<string> _secretnamesReference = new List<string>();
     public List<GameObject> _avatarList = new List<GameObject>();
     public List<string> _secretActionReference = new List<string>();
@@ -51,6 +52,7 @@ public class MatchHandler : MonoBehaviour
     void Start()
     {
         _reference = FirebaseDatabase.DefaultInstance.RootReference;
+        _realtimeDatabase = gameObject.GetComponent<RealtimeDatabase>();
         _countDownTimer = GameObject.Find("Round Timer");
         _roundTitle = GameObject.Find("Round Title");
         _characterListGO = GameObject.Find("Characters");
@@ -100,6 +102,12 @@ public class MatchHandler : MonoBehaviour
 
     public void MatchStart(bool host)
     {
+        Debug.Log(System.Environment.StackTrace);
+        //if (_matchLocal.RoundCurrent != 0)
+        //{
+        //    return;
+        //}
+
         Debug.Log("Voting Round has started");
         _roundLast = Rounds.GameOver;
         StartCoroutine(LateInit());
@@ -125,8 +133,8 @@ public class MatchHandler : MonoBehaviour
     {
         yield return new WaitForSeconds(0.2f);
         _characterListGO.transform.position = GameObject.Find("Character Anchor").transform.position; //Move characters to center of screen
-        GameObject.Find("Left Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarNext(); });
-        GameObject.Find("Right Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarLast(); });
+        GameObject.Find("Left Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarCycle(false); });
+        GameObject.Find("Right Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarCycle(true); });
         GameObject.Find("Vote Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarVote(); });
         GameObject.Find("Send Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarSend(); });
 
@@ -161,6 +169,8 @@ public class MatchHandler : MonoBehaviour
             listText += user.UserName + " - " + user.SecretName + "\n";
        }
         secretNameListText.GetComponent<Text>().text = listText;
+
+        _realtimeDatabase.AvatarCycle(true);
     }
 
     private void MatchUpdateHost()
@@ -396,6 +406,7 @@ public class MatchHandler : MonoBehaviour
                 //Debug.Log(snapshot.Child("UserName").Value.ToString
 
                 _userList.Clear();
+                if (_matchStartedHost == true) _matchLocal.AvatarsPicked.Clear();
 
                 int count = 0;
                 foreach (var child in snapshot.Children)
@@ -429,6 +440,13 @@ public class MatchHandler : MonoBehaviour
                     //    _userList.Remove(userCurrent);
                     //    _userList.Add(user);
                     //}
+
+
+                    // Update Match info
+                    if (_matchStartedHost == true)
+                    {
+                        _matchLocal.AvatarsPicked.Add(user.Avatar);
+                    }
                 }
                 //Debug.Log("number of users " + count);
             }
@@ -521,10 +539,9 @@ public class MatchHandler : MonoBehaviour
         match.ActionDescend = _secretActionReference[actionDescendInt];
 
         // Save to Database
-        string json = JsonUtility.ToJson(match);
-        Debug.Log(json);
-
-        _reference.Child("Match").SetRawJsonValueAsync(json).ContinueWith(task =>
+        string matchJson = JsonUtility.ToJson(match);
+        Debug.Log(matchJson);
+        _reference.Child("Match").SetRawJsonValueAsync(matchJson).ContinueWith(task =>
         {
             if (task.IsCompleted)
             {
@@ -536,6 +553,18 @@ public class MatchHandler : MonoBehaviour
             }
         });
 
+        string userJson = "{}";
+        _reference.Child("User").SetRawJsonValueAsync(userJson).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Successfully added data to Firebase.");
+            }
+            else
+            {
+                Debug.Log("Adding data failed.");
+            }
+        });
 
     }
 }
