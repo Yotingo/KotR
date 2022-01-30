@@ -211,7 +211,7 @@ public class RealtimeDatabase : MonoBehaviour
 
             //------------------------Team & Action-------------------------
             // Even player : something divided by two without remainder is even
-            if ((_matchHandler._matchLocal.SecretNamesPicked.Count - 1) % 2 == 0)
+            if ((_matchHandler._userList.Count - 1) % 2 == 0)
             {
                 user.Team = "Ascend Team";
                 user.SecretAction = _matchHandler._matchLocal.ActionAscend;
