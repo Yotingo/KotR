@@ -8,6 +8,7 @@ public class Match
     public int RoundCurrent = 0;
     public bool IsGameOver = false;
     public string ListHolderUserName = "";
+    public string LastSentUserName = "";
 
     public List<string> SecretNamesPicked = new List<string>();
     public List<string> AvatarsPicked = new List<string>();

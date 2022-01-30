@@ -22,11 +22,40 @@ public class RealtimeDatabase : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-
     void Start()
     {
         _reference = FirebaseDatabase.DefaultInstance.RootReference;
 
+        _reference.Child("Match").ValueChanged += HandleLastSentUserChanged;
+    }
+
+    void HandleLastSentUserChanged(object sender, ValueChangedEventArgs args)
+    {
+        if (args.DatabaseError != null)
+        {
+            Debug.LogError(args.DatabaseError.Message);
+            return;
+        }
+
+        // Read from Database
+        Match match = JsonUtility.FromJson<Match>(args.Snapshot.GetRawJsonValue());
+
+        // The last sent username has changed
+        if (_matchHandler._matchLocal.LastSentUserName != match.LastSentUserName) // && _matchHandler._matchLocal.LastSentUserName != "")
+        {
+            Debug.Log("Last user sent " + match.LastSentUserName);
+
+            foreach (User user in _matchHandler._userList)
+            {
+                if (user.UserName == match.LastSentUserName)
+                {
+                    _matchHandler.PlayerSentPop(user);
+                    break;
+                }
+            }
+        }
+
+        _matchHandler._matchLocal = match;
     }
 
     //void OnSceneLoaded (Scene scene, LoadSceneMode mode)

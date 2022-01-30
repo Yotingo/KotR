@@ -47,6 +47,7 @@ public class MatchHandler : MonoBehaviour
     [HideInInspector] public GameObject newPlayerHasListPopup;
 
     [HideInInspector] public GameObject secretNameListPanel;
+    [HideInInspector] public GameObject secretInfoPanel;
     [HideInInspector] public GameObject secretNameListText;
 
     void Start()
@@ -162,6 +163,10 @@ public class MatchHandler : MonoBehaviour
         secretNameListText = GameObject.Find("Scroll List True Names Text");
         secretNameListPanel.SetActive(false);
 
+        secretInfoPanel = GameObject.Find("Secret Info Panel");
+        secretInfoPanel.gameObject.transform.GetChild(0).GetComponent<Text>().text = _userLocal.Team;
+        secretInfoPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = _userLocal.SecretAction;
+
         GameObject clickBlocker = GameObject.Find("Click Blocker");
         clickBlocker.SetActive(false);
 
@@ -225,10 +230,23 @@ public class MatchHandler : MonoBehaviour
                         }
                     }
 
+                    
                     string winningUsername;
                     if (highestPair.Equals(default(KeyValuePair<string, int>))) // if the highestPair equals zero (no votes were made)
                     {
                         int winner = Random.Range(0, _userList.Count - 1);
+                        
+                        // Make sure the winner isn't already sent
+                        while (_userList[winner].sentUp || _userList[winner].sentDown)
+                        {
+                            winner += 1;
+
+                            if (winner >= _userList.Count)
+                            {
+                                winner = 0;
+                            }
+                        }
+                        
                         winningUsername = _userList[winner].UserName;
                     }
                     else
@@ -404,7 +422,7 @@ public class MatchHandler : MonoBehaviour
         }    
 
         User userToSend = null;
-        string typedName = GameObject.Find("Player True Name InputField").GetComponent<Text>().text;
+        string typedName = GameObject.Find("Player True Name InputField").GetComponent<InputField>().text;
 
         foreach (User user in _userList)
         {
@@ -431,13 +449,31 @@ public class MatchHandler : MonoBehaviour
             userToSend.sentDown = true;
         }
 
-        //-------------------Add User to database--------------------
-        string json = JsonUtility.ToJson(userToSend); //Comvert class to json file
-        _reference.Child("User").Child(userToSend.UserName).SetRawJsonValueAsync(json).ContinueWith(task =>
+        // Save to Database
+        _matchLocal.LastSentUserName = userToSend.UserName;
+        string json = JsonUtility.ToJson(_matchLocal);
+        //Debug.Log(json);
+
+        _reference.Child("Match").SetRawJsonValueAsync(json).ContinueWith(task =>
         {
             if (task.IsCompleted)
             {
-                Debug.Log("Successfully added data to Firebase.");
+                //Debug.Log("Successfully added data to Firebase.");
+            }
+            else
+            {
+                //Debug.Log("Adding data failed.");
+            }
+        });
+
+        //-------------------Add User to database--------------------
+        string Userjson = JsonUtility.ToJson(userToSend); //Comvert class to json file
+        _reference.Child("User").Child(userToSend.UserName).SetRawJsonValueAsync(Userjson).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("Successfully added \"send\" to Firebase.");
+                GameOverCheck();
             }
             else
             {
@@ -508,7 +544,7 @@ public class MatchHandler : MonoBehaviour
         //}
     }
 
-    private void PlayerSentPop (User userSent)
+    public void PlayerSentPop (User userSent)
     {
         // Activate pop up
         playerSentPopup.SetActive(true);
@@ -544,13 +580,34 @@ public class MatchHandler : MonoBehaviour
         }
     }
 
-    private void WinSreen (bool upWon)
+    private void WinSreen(bool upWon)
     {
-        if( upWon)
+        Debug.Log("Game Over " + upWon);
+        _gameOverScreen.SetActive(true);
+        _gameOverWinnerText.GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!";
+
+        // Update match to new phase
+        _roundCurrent = Rounds.GameOver;
+        _matchLocal.IsGameOver = true;
+        _matchLocal.RoundCurrent = (int)Rounds.GameOver;
+
+        //_matchLocal.RoundTimer = _roundChangeTime - Time.time;
+
+        // Save to Database
+        string json = JsonUtility.ToJson(_matchLocal);
+        //Debug.Log(json);
+
+        _reference.Child("Match").SetRawJsonValueAsync(json).ContinueWith(task =>
         {
-            _gameOverScreen.SetActive(true);
-            _gameOverWinnerText.GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!"; 
-        }
+            if (task.IsCompleted)
+            {
+                //Debug.Log("Successfully added data to Firebase.");
+            }
+            else
+            {
+                //Debug.Log("Adding data failed.");
+            }
+        });
     }
 
     public void PrepareForMatch () //called by Clients
