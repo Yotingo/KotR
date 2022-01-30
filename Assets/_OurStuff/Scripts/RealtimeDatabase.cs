@@ -238,6 +238,7 @@ public class RealtimeDatabase : MonoBehaviour
         if (_username.text == "Yotingo")
         {
             _matchHandler.ResetMatch(); // Setup and reset database match files
+            _matchHandler._matchStartedHost = true;
         }
         //else
         //{
@@ -245,7 +246,7 @@ public class RealtimeDatabase : MonoBehaviour
         //}
     }
 
-    public void AvatarNext()
+    public void AvatarCycle(bool directionForward)
     {
         //-------------------------------Disable Current Avatar--------------------------
         // Find 'Avatar Number' and set reference
@@ -261,118 +262,211 @@ public class RealtimeDatabase : MonoBehaviour
 
 
         //---------------------------------On Menu Screen-----------------------------
-        if (_matchHandler._matchStartedHost == false) 
+        if (_matchHandler._roundCurrent == 0) 
         {
             bool nextAvailableAvatarFound = false;
             while (nextAvailableAvatarFound == false)
             {
-                avatarNumberCur += 1;
-
-                if (avatarNumberCur > _matchHandler._avatarList.Count - 1)
+                if (directionForward == true)
                 {
-                    avatarNumberCur = 0;
-                }
+                    avatarNumberCur += 1;
 
-                // This avatar is available
-                if (_matchHandler._matchLocal != null && _matchHandler._matchLocal.AvatarsPicked != null)
-                {
-                    if (!_matchHandler._matchLocal.AvatarsPicked.Contains(_matchHandler._avatarList[avatarNumberCur].name))
+                    if (avatarNumberCur > _matchHandler._avatarList.Count - 1)
                     {
-                        nextAvailableAvatarFound = true; // Continue
+                        avatarNumberCur = 0;
                     }
                 }
                 else
                 {
-                    nextAvailableAvatarFound = true; // Continue
+                    avatarNumberCur -= 1;
+
+                    if (avatarNumberCur < 0)
+                    {
+                        avatarNumberCur = _matchHandler._avatarList.Count - 1;
+                    }
+                }
+
+                Debug.Log(_matchHandler._matchLocal.AvatarsPicked);
+                Debug.Log(_matchHandler._matchLocal.AvatarsPicked.Count);
+
+                // Null check
+                if (_matchHandler._matchLocal.AvatarsPicked.Count <= 0)
+                {
+                    break;
+                }
+
+                // This avatar is available
+                if (_matchHandler._matchLocal.AvatarsPicked.Contains(_matchHandler._avatarList[avatarNumberCur].name))
+                {
+                    //nextAvailableAvatarFound = false; // Continue
+                    // Don't do nothin'
+                    Debug.Log("Next button on menu screen");
+                }
+                else
+                {
+                    nextAvailableAvatarFound = true; // break
                 }
             }
         }
         //------------------------------On gameplay screen---------------------------
         else
         {
-            Debug.Log("Avatar Next");
-
-            string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
-            bool hasBeenSent = false;
-
-            foreach (User user in _matchHandler._userList)
+            bool nextAvailableAvatarFound = false;
+            while (nextAvailableAvatarFound == false)
             {
-                Debug.Log(user.UserName);
-
-                if (user.Avatar == avatarNameCur)
+                if (directionForward == true)
                 {
-                    if (user.sentUp == true) hasBeenSent = true;
-                    if (user.sentDown == true) hasBeenSent = true;
+                    avatarNumberCur += 1;
 
-                    _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName; // Not working
-                    Debug.Log("User's name is " + user.UserName);
+                    if (avatarNumberCur > _matchHandler._avatarList.Count - 1)
+                    {
+                        avatarNumberCur = 0;
+                    }
+                }
+                else
+                {
+                    avatarNumberCur -= 1;
+
+                    if (avatarNumberCur < 0)
+                    {
+                        avatarNumberCur = _matchHandler._avatarList.Count - 1;
+                    }
+                }
+
+                Debug.Log(_matchHandler._matchLocal.AvatarsPicked);
+                Debug.Log(_matchHandler._matchLocal.AvatarsPicked.Count);
+
+                // Null check
+                if (_matchHandler._matchLocal.AvatarsPicked.Count <= 0)
+                {
+                    break;
+                }
+
+                // This avatar has been sent -- don't appear on vote list
+                bool hasBeenSent = false;
+                string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
+                foreach (User user in _matchHandler._userList)
+                {
+                    if (user.Avatar == avatarNameCur)
+                    {
+                        if (user.sentUp == true) hasBeenSent = true;
+                        if (user.sentDown == true) hasBeenSent = true;
+
+                        _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName;
+                        Debug.Log("User's name is " + user.UserName);
+
+                        break;
+                    }
+                }
+
+                // Grey out avatars that have been sent
+                if (hasBeenSent == false && _matchHandler._userLocal.Avatar != avatarNameCur)
+                {
+                    GameObject.Find("Directional Light").GetComponent<Light>().intensity = 1.88f;
+                    _matchHandler._voteButton.SetActive(true);
+                    Debug.Log("Light On");
+                }
+                else
+                {
+                    GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
+                    _matchHandler._voteButton.SetActive(false);
+                    Debug.Log("Light Off");
+                }
+
+                // This avatar belongs to a player
+                if (_matchHandler._matchLocal.AvatarsPicked.Contains(avatarNameCur)) //&& !hasBeenSent)
+                {
+                    nextAvailableAvatarFound = true; // break
+                }
+                else
+                {
+                    Debug.Log("Next button on menu screen");
                 }
             }
 
-            if (_matchHandler._matchLocal.AvatarsPicked.Contains(avatarNameCur) == true || hasBeenSent == false || _matchHandler._userLocal.Avatar != avatarNameCur)
-            {
-                GameObject.Find("Directional Light").GetComponent<Light>().intensity = 1.88f;
-                _matchHandler._voteButton.SetActive(true);
-            }
-            else
-            {
-                GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
-                _matchHandler._voteButton.SetActive(false);
-            }
+            //Debug.Log("Avatar Next");
+
+            //string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
+            //bool hasBeenSent = false;
+
+            //foreach (User user in _matchHandler._userList)
+            //{
+            //    Debug.Log(user.UserName);
+
+            //    if (user.Avatar == avatarNameCur)
+            //    {
+            //        if (user.sentUp == true) hasBeenSent = true;
+            //        if (user.sentDown == true) hasBeenSent = true;
+
+            //        _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName; // Not working
+            //        Debug.Log("User's name is " + user.UserName);
+            //    }
+            //}
+
+            //if (_matchHandler._matchLocal.AvatarsPicked.Contains(avatarNameCur) == true || hasBeenSent == false || _matchHandler._userLocal.Avatar != avatarNameCur)
+            //{
+            //    GameObject.Find("Directional Light").GetComponent<Light>().intensity = 1.88f;
+            //    _matchHandler._voteButton.SetActive(true);
+            //}
+            //else
+            //{
+            //    GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
+            //    _matchHandler._voteButton.SetActive(false);
+            //}
         }
 
         // Enable selected avatar
         _avatarNumber.text = avatarNumberCur.ToString();
         _matchHandler._avatarList[avatarNumberCur].SetActive(true);
     }
+    
+    //public void AvatarLast ()
+    //{
+    //    if (_avatarNumber == null)
+    //    {
+    //        _avatarNumber = GameObject.Find("Avatar Number").GetComponent<Text>();
+    //        _avatarNumber.text = 0.ToString();
+    //    }
 
-    public void AvatarLast ()
-    {
-        if (_avatarNumber == null)
-        {
-            _avatarNumber = GameObject.Find("Avatar Number").GetComponent<Text>();
-            _avatarNumber.text = 0.ToString();
-        }
+    //    int avatarNumberCur = int.Parse(_avatarNumber.text);
+    //    _matchHandler._avatarList[avatarNumberCur].SetActive(false);
+    //    avatarNumberCur -= 1;
 
-        int avatarNumberCur = int.Parse(_avatarNumber.text);
-        _matchHandler._avatarList[avatarNumberCur].SetActive(false);
-        avatarNumberCur -= 1;
+    //    if (avatarNumberCur < 0)
+    //    {
+    //        avatarNumberCur = _matchHandler._avatarList.Count - 1;
+    //    }
 
-        if (avatarNumberCur < 0)
-        {
-            avatarNumberCur = _matchHandler._avatarList.Count - 1;
-        }
+    //    _avatarNumber.text = avatarNumberCur.ToString();
+    //    _matchHandler._avatarList[avatarNumberCur].SetActive(true);
 
-        _avatarNumber.text = avatarNumberCur.ToString();
-        _matchHandler._avatarList[avatarNumberCur].SetActive(true);
+    //    if (_matchHandler._matchStartedHost == true) // On gameplay screen. Do voting.
+    //    {
+    //        string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
+    //        bool hasBeenSent = false;
+    //        foreach (User user in _matchHandler._userList)
+    //        {
+    //            if (user.Avatar == avatarNameCur)
+    //            {
+    //                if (user.sentUp == true) hasBeenSent = true;
+    //                if (user.sentDown == true) hasBeenSent = true;
 
-        if (_matchHandler._matchStartedHost == true) // On gameplay screen. Do voting.
-        {
-            string avatarNameCur = _matchHandler._avatarList[avatarNumberCur].name;
-            bool hasBeenSent = false;
-            foreach (User user in _matchHandler._userList)
-            {
-                if (user.Avatar == avatarNameCur)
-                {
-                    if (user.sentUp == true) hasBeenSent = true;
-                    if (user.sentDown == true) hasBeenSent = true;
+    //                _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName;
+    //            }
+    //        }
 
-                    _matchHandler.playerNameLabel.GetComponent<Text>().text = user.UserName;
-                }
-            }
-
-            if (_matchHandler._matchLocal.AvatarsPicked.Contains(avatarNameCur) == true || hasBeenSent == false || _matchHandler._userLocal.Avatar != avatarNameCur)
-            {
-                GameObject.Find("Directional Light").GetComponent<Light>().intensity = 1.88f;
-                _matchHandler._voteButton.SetActive(true);
-            }
-            else
-            {
-                GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
-                _matchHandler._voteButton.SetActive(false);
-            }    
-        }
-    }
+    //        if (_matchHandler._matchLocal.AvatarsPicked.Contains(avatarNameCur) == true || hasBeenSent == false || _matchHandler._userLocal.Avatar != avatarNameCur)
+    //        {
+    //            GameObject.Find("Directional Light").GetComponent<Light>().intensity = 1.88f;
+    //            _matchHandler._voteButton.SetActive(true);
+    //        }
+    //        else
+    //        {
+    //            GameObject.Find("Directional Light").GetComponent<Light>().intensity = 0.25f;
+    //            _matchHandler._voteButton.SetActive(false);
+    //        }    
+    //    }
+    //}
 
     // Called when join match is selected
     public bool AvatarSelect ()

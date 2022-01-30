@@ -4,13 +4,13 @@ using UnityEngine;
 
 public class Match
 {
-    public float RoundTimer; // Used to calculate round countdown timer
-    public int RoundCurrent;
-    public bool IsGameOver;
-    public string ListHolderUserName;
+    public float RoundTimer = 0f; // Used to calculate round countdown timer
+    public int RoundCurrent = 0;
+    public bool IsGameOver = false;
+    public string ListHolderUserName = "";
 
     public List<string> SecretNamesPicked = new List<string>();
     public List<string> AvatarsPicked = new List<string>();
-    public string ActionAscend;
-    public string ActionDescend;
+    public string ActionAscend = "";
+    public string ActionDescend = "";
 }
