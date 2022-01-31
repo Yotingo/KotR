@@ -45,6 +45,7 @@ public class MatchHandler : MonoBehaviour
 
     [HideInInspector] public GameObject gameOverPanel;
     string gameOverText;
+    bool ascendWon = false;
 
     [HideInInspector] public GameObject playerSentPopup;
     [HideInInspector] public GameObject playerSentText;
@@ -120,7 +121,7 @@ public class MatchHandler : MonoBehaviour
 
         if (host)
         {
-            _roundCurrent = Rounds.Voting;
+            _roundCurrent = Rounds.Initializing;
             _matchLocal.RoundCurrent = 1;
             _roundChangeTime = Time.time + 10f;
             _matchStartedHost = true;
@@ -144,7 +145,7 @@ public class MatchHandler : MonoBehaviour
         GameObject.Find("Vote Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarVote(); });
         GameObject.Find("Send Button").GetComponent<Button>().onClick.AddListener(delegate { GetComponent<RealtimeDatabase>().AvatarSend(); });
 
-        yield return new WaitForSeconds(2.3f);
+        yield return new WaitForSeconds(1.8f);
         _countDownTimer = GameObject.Find("Round Timer");
         _roundTitle = GameObject.Find("Round Title");
         _voteButton = GameObject.Find("Vote Button");
@@ -189,6 +190,9 @@ public class MatchHandler : MonoBehaviour
         _realtimeDatabase.AvatarCycle(true);
 
         initDone = true;
+
+        yield return new WaitForSeconds(0.1f);
+        if (_matchStartedClient == true) gameOverPanel.SetActive(true);
     }
 
     private void MatchUpdateHost()
@@ -220,7 +224,8 @@ public class MatchHandler : MonoBehaviour
                     // The initializing round is used in place of a lobby. We can't jump staight into a voting round without all the players being connected.
                     Debug.Log("Voting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting starts in:";
-                    _roundChangeTime = Time.time + 10f;
+                    _roundChangeTime = Time.time + 3f;
+                    gameOverPanel.SetActive(false);
                     _matchLocal.RoundCurrent = 2; //Move to Voting Round
                     _roundCurrent = Rounds.Voting;
                     break;
@@ -316,7 +321,8 @@ public class MatchHandler : MonoBehaviour
                     _roundChangeTime = Time.time + 10f;
                     _matchLocal.RoundCurrent = 1; //Move to Initializing Round
                     gameOverPanel.SetActive(true);
-                    gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = gameOverText;
+                    if (ascendWon == true) gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = "Ascend Team won!";
+                    else gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = "Descend Team won!";
                     //TO-DO: Return to main menu
                     break;
             }
@@ -405,6 +411,7 @@ public class MatchHandler : MonoBehaviour
 
                     Debug.Log("Voting Round has started");
                     _roundTitle.GetComponent<Text>().text = "Voting ends in:";
+                    gameOverPanel.SetActive(false);
                 }
                 break;
 
@@ -437,7 +444,8 @@ public class MatchHandler : MonoBehaviour
                 {
                     Debug.Log("Game over Round has started");
                     gameOverPanel.SetActive(true);
-                    gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = gameOverText;
+                    if (ascendWon == true) gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = "Ascend Team won!";
+                    else gameOverPanel.gameObject.transform.GetChild(2).GetComponent<Text>().text = "Descend Team won!";
                 }
                 break;
         }
@@ -523,7 +531,7 @@ public class MatchHandler : MonoBehaviour
                 DataSnapshot snapshot = task.Result;
                 //Debug.Log(snapshot.Child("UserName").Value.ToString
 
-                _userList.Clear();
+                //_userList.Clear();
                 //if (_matchStartedHost == true) _matchLocal.AvatarsPicked.Clear();
 
                 int count = 0;
@@ -538,7 +546,19 @@ public class MatchHandler : MonoBehaviour
                     //Debug.Log(user.UserName);
 
                     // Build _userList
-                    _userList.Add(user);
+                    bool alreadyInList = false;
+                    foreach (User userLocal in _userList)
+                    {
+                        if (userLocal.UserName == user.UserName)
+                        {
+                            alreadyInList = true;
+                        }
+                    }
+                    if (alreadyInList == false)
+                    {
+                        _userList.Add(user);
+                        Debug.Log("Add user to userlist " + user.UserName);
+                    }
 
                     //// Send Check
                     //foreach (User userCurrent in _userList)
@@ -606,11 +626,13 @@ public class MatchHandler : MonoBehaviour
 
             if (totalSentUp >= target)
             {
+                ascendWon = true;
                 WinSreen(true);
                 break;
             }
             if (totalSentDown >= target)
             {
+                ascendWon = false;
                 WinSreen(false);
                 break;
             }
@@ -627,7 +649,7 @@ public class MatchHandler : MonoBehaviour
 
         //gameOverPanel.SetActive(true);
         //gameOverPanel.gameObject.transform.GetChild(1).GetComponent<Text>().text = upWon ? "Ascend Team won!" : "Descend Team won!";
-        gameOverText = upWon ? "Ascend Team won!" : "Descend Team won!";
+        //gameOverText = upWon ? "Ascend Team won!" : "Descend Team won!";
 
         Debug.Log("2");
         // Update match to new phase
