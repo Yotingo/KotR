@@ -4,3 +4,7 @@ Assets/Firebase/Plugins/x86_64/FirebaseCppApp-8_6_1.so filter=lfs diff=lfs merge
 *.rar filter=lfs diff=lfs merge=lfs -text
 *.aar filter=lfs diff=lfs merge=lfs -text
 *.png filter=lfs diff=lfs merge=lfs -text
+# Force line-feed only on resource asset files
+bin/* text eol=lf
+Assets/Resources/English[[:space:]]Adjectives.txt
+Assets/Resources/English[[:space:]]Nouns.txt
