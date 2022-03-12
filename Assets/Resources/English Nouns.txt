@@ -161,4 +161,5 @@ Furniture
 Oyster
 Glass
 Garage
-Ghost	
+Ghost
+Mouse
