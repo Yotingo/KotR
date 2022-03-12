@@ -84,10 +84,10 @@ public class UpdateLobby : MonoBehaviour
         //Dictionary<string, Object> childUpdates = new Dictionary<string, Object>();
         //childUpdates["/Rooms/" + key] = jsonMatch;
 
-        string room = "TestRoom";
-        room = "\"" + room + "\""; // Adding Quotes | Have tried it with and without this line
-        Debug.Log(room); //Prints "TestRoom" 
-        PersistentLocal.persistentLocal.databaseReference.Child(room).Child("Match").SetRawJsonValueAsync(jsonMatch);
+        //string room = "TestRoom";
+        //room = "\"" + room + "\""; // Adding Quotes | Have tried it with and without this line
+        Debug.Log(_roomCode); //Prints "TestRoom" 
+        PersistentLocal.persistentLocal.databaseReference.Child(_roomCode).Child("Match").SetRawJsonValueAsync(jsonMatch);
 
 
 
