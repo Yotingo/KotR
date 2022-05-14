@@ -10,6 +10,7 @@ public class Match
     public string ListHolderUserName = "";
     public string LastSentUserName = "";
 
+    public List<User> UserList = new List<User>();
     public List<string> SecretNamesPicked = new List<string>();
     public List<string> AvatarsPicked = new List<string>();
     public string ActionAscend = "";

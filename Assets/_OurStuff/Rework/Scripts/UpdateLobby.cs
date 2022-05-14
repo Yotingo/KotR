@@ -39,24 +39,33 @@ public class UpdateLobby : MonoBehaviour
             // Read from Database
             FirebaseDatabase.DefaultInstance.GetReference(_roomCode).GetValueAsync().ContinueWith(task =>
             {
-                // Room doesn't exist, let's create it.
+                // Error fetching room
                 if (task.IsFaulted)
                 {
-                    roomCodeValid = true; // found valid room code, leave the while loop
-                    Debug.Log("Room doesn't exist");
+                    Debug.LogError("Error reading room database! _roomCode:"+_roomCode);
+                    return;
                 }
-                // Room already exists, try a new name.
+                // Room fetch complete
                 else if (task.IsCompleted)
                 {
-                    // Keep trying
-                    Debug.Log("Room already exists");
+                    DataSnapshot snapshot = task.Result;
+                    if( snapshot.Value == null )
+                    {
+                        roomCodeValid = true; // found valid room code, leave the while loop
+                        Debug.Log("Room doesn't exist, using this code to make a new room. _roomCode:"+_roomCode);
+                    }
+                    else
+                    {
+                        // Room already exists, try a new name.
+                        Debug.Log("Room already exists, trying a new room. _roomCode:"+_roomCode);
+                    }
                 }
             });
 
             if (attemptTime < Time.time)
             {
-                Debug.Log("Couldn't access the Database");
-                roomCodeValid = true;
+                Debug.LogError("Couldn't access the Database");
+                yield break;
             }
 
             //yield return new WaitUntil(() => roomCodeValid);
@@ -72,10 +81,8 @@ public class UpdateLobby : MonoBehaviour
         //bool roomCreated = false;
 
         //System.Activator.CreateInstance(typeof.GetType("Test"));
-        string jsonRoom = JsonUtility.ToJson(_roomCode); // Json Utility can't take Strings, only Objects (classes)
-        Debug.Log(jsonRoom);
         string jsonMatch = JsonUtility.ToJson(PersistentLocal.persistentLocal.matchLocal);
-
+        Debug.Log(jsonMatch);
 
         //System.Text.Encoding.UTF8.GetBytes(_roomCode)
         //string key = PersistentLocal.persistentLocal.databaseReference.Child("why").Push().Key;
@@ -87,11 +94,23 @@ public class UpdateLobby : MonoBehaviour
         //string room = "TestRoom";
         //room = "\"" + room + "\""; // Adding Quotes | Have tried it with and without this line
         Debug.Log(_roomCode); //Prints "TestRoom" 
-        PersistentLocal.persistentLocal.databaseReference.Child(_roomCode).Child("Match").SetRawJsonValueAsync(jsonMatch);
-
-
-
-
+        PersistentLocal.persistentLocal.databaseReference.Child(_roomCode).Child("Match").SetRawJsonValueAsync(jsonMatch).ContinueWith(task =>
+        {
+            // Room creation failed
+            if( task.IsFaulted )
+            {
+                Debug.LogError("Error creating room! _roomCode:"+_roomCode);
+                return;
+            }
+            // Room creation task completed
+            else if( task.IsCompleted )
+            {
+                // Room was created successfully
+                Debug.Log("Successfully created the Room and Match");
+                // join host to room
+                JoinLobby(_roomCode);
+            }
+        });
 
 
         //PersistentLocal.persistentLocal.databaseReference.Child(jsonRoom).Child("Match").SetRawJsonValueAsync(jsonMatch).ContinueWith(task =>
@@ -125,7 +144,7 @@ public class UpdateLobby : MonoBehaviour
         //});
 
         //yield return new WaitUntil(() => roomCreated);
-        yield return new WaitForSeconds(1f);
+        //yield return new WaitForSeconds(1f);
 
         // Push the match to the Database
 
@@ -181,6 +200,13 @@ public class UpdateLobby : MonoBehaviour
             return;
         }
 
+        JoinLobby(_roomCodeInputField.text);
+    }
 
+    public void JoinLobby(string roomCode)
+    {
+        // get current room
+        // add self to userlist
+        // save room/match/lobby
     }
 }
