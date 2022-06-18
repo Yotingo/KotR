@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.09432862, g: 0.11934111, b: 0.15628296, a: 1}
+  m_IndirectSpecularColor: {r: 0.094257034, g: 0.11950519, b: 0.15506512, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -263,8 +263,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77d5fac37640eef40b7fc7bb7671bc96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _joinButton: {fileID: 1568545101}
   _roomCodeInputField: {fileID: 364826507}
+  _sceneChange: {fileID: 570612242}
 --- !u!4 &189459727
 Transform:
   m_ObjectHideFlags: 0
@@ -1326,7 +1326,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 64.09999, y: -207.6}
+  m_AnchoredPosition: {x: 64.099976, y: -207.6}
   m_SizeDelta: {x: 122.05, y: 122.05}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &704402825
@@ -2995,7 +2995,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1568545099}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 189459726}
+        m_TargetAssemblyTypeName: UpdateLobby, Assembly-CSharp
+        m_MethodName: JoinButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1581026409
 GameObject:
   m_ObjectHideFlags: 0
@@ -3189,7 +3201,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -66.32399, y: -200.32701}
+  m_AnchoredPosition: {x: -66.323975, y: -200.32701}
   m_SizeDelta: {x: 107.511, y: 107.506}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1664640606
@@ -3590,7 +3602,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc57c0cfa5bd9b0448c12081ea74b41b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roomCode: 
   stage: 0
 --- !u!4 &2000480644
 Transform:

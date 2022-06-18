@@ -11,8 +11,8 @@ public class UpdateLobby : MonoBehaviour
     string _roomCode;
 
     // Scene References
-    public Button _joinButton;
     public InputField _roomCodeInputField;
+    public SceneChange _sceneChange;
 
 
     private void Start()
@@ -205,8 +205,14 @@ public class UpdateLobby : MonoBehaviour
 
     public void JoinLobby(string roomCode)
     {
+        // TODO: make a Main scene that handles loading and unloading all the other scenes (LevelMaster style)
+        Debug.Log("Joining Lobby for code:"+roomCode);
+        _sceneChange.GoToScene("Lobby");
+
         // get current room
         // add self to userlist
         // save room/match/lobby
+
+        // TODO Mitch: listen for room changes
     }
 }
